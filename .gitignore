@@ -3,3 +3,6 @@ tags
 test
 test_g
 test_fast
+*.suo
+bin
+obj
