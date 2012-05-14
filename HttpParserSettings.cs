@@ -9,7 +9,7 @@ namespace HttpParser
     public class HttpParserSettings
     {
         internal delegate int http_cb(HttpParser parser);
-        internal unsafe delegate int http_data_cb(HttpParser parser, char* at, uint length);
+        internal unsafe delegate int http_data_cb(HttpParser parser, byte* at, uint length);
 
         internal http_cb on_message_begin { get; set; }
         internal http_data_cb on_url { get; set; }
@@ -20,7 +20,7 @@ namespace HttpParser
         internal http_cb on_message_complete { get; set; }
 
         public delegate bool Notification(HttpParser parser);
-        public delegate bool Data(HttpParser parser, string data);
+        public delegate bool Data(HttpParser parser, byte[] data);
 
         public Notification MessageBegan { get; set; }
         public Data Url { get; set; }
@@ -46,19 +46,25 @@ namespace HttpParser
             return Convert.ToInt32(MessageBegan(parser));
         }
 
-        internal unsafe int on_url_wrapper(HttpParser parser, char* at, uint length)
+        internal unsafe int on_url_wrapper(HttpParser parser, byte* at, uint length)
         {
-            return Convert.ToInt32(Url(parser, Marshal.PtrToStringUni((IntPtr)at, (int)length)));
+            var data = new byte[(int)length];
+            Marshal.Copy((IntPtr)at, data, 0, (int)length);
+            return Convert.ToInt32(Url(parser, data));
         }
 
-        internal unsafe int on_header_field_wrapper(HttpParser parser, char* at, uint length)
+        internal unsafe int on_header_field_wrapper(HttpParser parser, byte* at, uint length)
         {
-            return Convert.ToInt32(HeaderField(parser, Marshal.PtrToStringUni((IntPtr)at, (int)length)));
+            var data = new byte[(int)length];
+            Marshal.Copy((IntPtr)at, data, 0, (int)length);
+            return Convert.ToInt32(HeaderField(parser, data));
         }
 
-        internal unsafe int on_header_value_wrapper(HttpParser parser, char* at, uint length)
+        internal unsafe int on_header_value_wrapper(HttpParser parser, byte* at, uint length)
         {
-            return Convert.ToInt32(HeaderValue(parser, Marshal.PtrToStringUni((IntPtr)at, (int)length)));
+            var data = new byte[(int)length];
+            Marshal.Copy((IntPtr)at, data, 0, (int)length);
+            return Convert.ToInt32(HeaderValue(parser, data));
         }
 
         internal int on_headers_complete_wrapper(HttpParser parser)
@@ -66,9 +72,11 @@ namespace HttpParser
             return Convert.ToInt32(HeadersCompleted(parser));
         }
 
-        internal unsafe int on_body_wrapper(HttpParser parser, char* at, uint length)
+        internal unsafe int on_body_wrapper(HttpParser parser, byte* at, uint length)
         {
-            return Convert.ToInt32(Body(parser, Marshal.PtrToStringUni((IntPtr)at, (int)length)));
+            var data = new byte[(int)length];
+            Marshal.Copy((IntPtr)at, data, 0, (int)length);
+            return Convert.ToInt32(Body(parser, data));
         }
 
         internal int on_message_complete_wrapper(HttpParser parser)

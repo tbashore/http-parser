@@ -219,28 +219,20 @@ namespace HttpParser
         }
 #endif
 
-        public unsafe uint Execute(char[] data)
+        public unsafe uint Execute(byte[] data, int length)
         {
-            fixed (char* p = data)
+            fixed (byte* p = data)
             {
-                return Execute(p, (uint)data.Length);
+                return Execute(p, (uint)length);
             }
         }
 
-        public unsafe uint Execute(string data)
-        {
-            fixed(char *p = data)
-            {
-                return Execute(p, (uint)data.Length);
-            }
-        }
-
-        public unsafe uint Execute(char* data, uint len)
+        public unsafe uint Execute(byte* data, uint len)
         {
             char c, ch;
             sbyte unhex_val;
-            char* p = data;
-            char *pe;
+            byte* p = data;
+            byte *pe;
             long to_read;
             State state;
             HeaderStates header_state;
@@ -250,9 +242,9 @@ namespace HttpParser
             /* technically we could combine all of these (except for url_mark) into one
             variable, saving stack space, but it seems more clear to have them
             separated. */
-            char *header_field_mark = null;
-            char *header_value_mark = null;
-            char *url_mark = null;
+            byte *header_field_mark = null;
+            byte *header_value_mark = null;
+            byte *url_mark = null;
 
             /* We're in an error state. Don't bother doing anything. */
             if (_http_errno != HttpErrNo.OK) 
@@ -305,7 +297,7 @@ namespace HttpParser
             {
                 for (p = data, pe = data + len; p != pe; p++)
                 {
-                    ch = *p;
+                    ch = (char)*p;
 
                     if (PARSING_HEADER(state))
                     {
