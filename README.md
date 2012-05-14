@@ -124,12 +124,12 @@ There are two types of callbacks:
 
 * notification `delegate int Notification (HttpParser);`
     Callbacks: MessageBegin, HeadersComplete, MessageComplete.
-* data `delegate int Data(HttpParser, string);`
+* data `delegate int Data(HttpParser, byte[]);`
     Callbacks: (requests only) Url,
                (common) HeaderField, HeaderValue, Body;
 
-Callbacks must return 0 on success. Returning a non-zero value indicates
-error to the parser, making it exit immediately.
+Callbacks must return false on success. Returning true indicates error
+to the parser, making it exit immediately.
 
 In case you parse HTTP message in chunks (i.e. `read()` request line
 from socket, parse, read half headers, parse, etc) your data callbacks
